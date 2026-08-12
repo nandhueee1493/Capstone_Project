@@ -1,0 +1,88 @@
+Phase 3 — Break & Detect
+
+Controlled fault: set Azure SQL server sql-7g0iy property publicNetworkAccess=Disabled.
+Single variable changed: only public network access (no other config changes).
+Flow: baseline capture → fault injection → detection evidence capture (before restore
+
+Requesting a Cloud Shell.Succeeded. 
+Connecting terminal...
+
+Your Cloud Shell session will be ephemeral so no files or system changes will persist beyond your current session.
+training [ ~ ]$ # 1) Check resources still exist
+RG="rg-aiinfra-Nandhini"
+SQL="$(az sql server list -g "$RG" --query "[0].name" -o tsv)"
+echo "SQL=$SQL"
+az sql server show -g "$RG" -n "$SQL" --query "{name:name,publicNetworkAccess:publicNetworkAccess}" -o table
+SQL=sql-7g0iy
+Name       PublicNetworkAccess
+---------  ---------------------
+sql-7g0iy  Disabled
+training [ ~ ]$ RG="rg-aiinfra-Nandhini"
+SQL="$(az sql server list -g "$RG" --query "[0].name" -o tsv)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT="$HOME/phase3-evidence-$TS"
+mkdir -p "$OUT"
+
+echo "[$(date -u +%FT%TZ)] Baseline" | tee "$OUT/timeline.log"
+az sql server show -g "$RG" -n "$SQL" -o json > "$OUT/sql_before.json"
+
+echo "[$(date -u +%FT%TZ)] Fault inject: Disable publicNetworkAccess" | tee -a "$OUT/timeline.log"
+az sql server update -g "$RG" -n "$SQL" --set publicNetworkAccess=Disabled -o json > "$OUT/fault_update.json"
+
+echo "[$(date -u +%FT%TZ)] Detect" | tee -a "$OUT/timeline.log"
+az sql server show -g "$RG" -n "$SQL" --query "{name:name,publicNetworkAccess:publicNetworkAccess}" -o json > "$OUT/sql_afterls -l "$OUT"ce folder: $OUT"" -n "$SQL" --set publicNetworkAccess=Enabled -o noneUT/activity_after_fault.json"
+[2026-08-12T10:14:15Z] Baseline
+[2026-08-12T10:14:18Z] Fault inject: Disable publicNetworkAccess
+[2026-08-12T10:14:28Z] Detect
+[2026-08-12T10:14:34Z] Restore
+Evidence folder: /home/training/phase3-evidence-20260812T101415Z
+total 228
+-rw-r--r-- 1 training training 214603 Aug 12 10:14 activity_after_fault.json
+-rw-r--r-- 1 training training    906 Aug 12 10:14 fault_update.json
+-rw-r--r-- 1 training training     63 Aug 12 10:14 sql_after_fault.json
+-rw-r--r-- 1 training training    906 Aug 12 10:14 sql_before.json
+-rw-r--r-- 1 training training    158 Aug 12 10:14 timeline.log
+training [ ~ ]$ cat "$OUT/timeline.log"
+cat "$OUT/sql_before.json"
+cat "$OUT/sql_after_fault.json"
+az sql server show -g "$RG" -n "$SQL" --query "{name:name,publicNetworkAccess:publicNetworkAccess}" -o table
+[2026-08-12T10:14:15Z] Baseline
+[2026-08-12T10:14:18Z] Fault inject: Disable publicNetworkAccess
+[2026-08-12T10:14:28Z] Detect
+[2026-08-12T10:14:34Z] Restore
+{
+  "administratorLogin": "sqladminuser",
+  "administratorLoginPassword": null,
+  "administrators": null,
+  "createMode": null,
+  "externalGovernanceStatus": "Disabled",
+  "federatedClientId": null,
+  "fullyQualifiedDomainName": "sql-7g0iy.database.windows.net",
+  "id": "/subscriptions/786a56c9-dc6f-40bd-811d-f70676789e37/resourceGroups/rg-aiinfra-Nandhini/providers/Microsoft.Sql/servers/sql-7g0iy",
+  "identity": null,
+  "isIPv6Enabled": null,
+  "keyId": null,
+  "kind": "v12.0",
+  "location": "eastus",
+  "minimalTlsVersion": "1.2",
+  "name": "sql-7g0iy",
+  "primaryUserAssignedIdentityId": null,
+  "privateEndpointConnections": [],
+  "publicNetworkAccess": "Disabled",
+  "resourceGroup": "rg-aiinfra-Nandhini",
+  "restrictOutboundNetworkAccess": "Disabled",
+  "retentionDays": -1,
+  "state": "Ready",
+  "tags": {},
+  "type": "Microsoft.Sql/servers",
+  "version": "12.0",
+  "workspaceFeature": null
+}
+{
+  "name": "sql-7g0iy",
+  "publicNetworkAccess": "Disabled"
+}
+Name       PublicNetworkAccess
+---------  ---------------------
+sql-7g0iy  Enabled
+training [ ~ ]$ 
