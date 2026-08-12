@@ -1,0 +1,90 @@
+training [ ~/tower-terraform-db-only ]$ RG="rg-aiinfra-Nandhini"
+
+# All resources in the resource group
+az resource list -g "$RG" -o table
+
+# Count of resources
+az resource list -g "$RG" --query "length(@)"
+
+# Only SQL resources
+az resource list -g "$RG" --query "[?contains(type,'Microsoft.Sql')].{name:name,type:type,location:location}" -o table
+
+# SQL server list
+az sql server list -g "$RG" -o table
+
+# SQL DB list (replace server name if needed)
+az sql db list -g "$RG" --server "sql-7g0iy" -o table
+
+# VM list
+az vm list -g "$RG" -d -o table
+
+# Networking summary
+az network vnet list -g "$RG" -o tabletable
+Name                                                  ResourceGroup        Location    Type                                     Status
+----------------------------------------------------  -------------------  ----------  ---------------------------------------  ---------
+vm-lab-ubuntuNSG                                      rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkSecurityGroups  Succeeded
+vm-lab-ubuntuPublicIP                                 rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-ubuntuVNET                                     rg-aiinfra-Nandhini  eastus      Microsoft.Network/virtualNetworks        Succeeded
+vm-lab-ubuntuVMNic                                    rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkInterfaces      Succeeded
+vm-lab-ubuntu                                         rg-aiinfra-Nandhini  eastus      Microsoft.Compute/virtualMachines        Succeeded
+vm-lab-ubuntu_disk1_4879362484914f1fa49257b1422d2403  RG-AIINFRA-NANDHINI  eastus      Microsoft.Compute/disks                  Succeeded
+vm-lab-winNSG                                         rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkSecurityGroups  Succeeded
+vm-lab-winPublicIP                                    rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-winVMNic                                       rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkInterfaces      Succeeded
+vm-lab-win                                            rg-aiinfra-Nandhini  eastus      Microsoft.Compute/virtualMachines        Succeeded
+vm-lab-win_disk1_3594618c67a64f8f88c262c17412ce1d     RG-AIINFRA-NANDHINI  eastus      Microsoft.Compute/disks                  Succeeded
+vm-lab-ubuntuVNET-IPv4                                rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-ubuntuVNET-bastion                             rg-aiinfra-Nandhini  eastus      Microsoft.Network/bastionHosts           Succeeded
+vnet-db-uvn9z                                         rg-aiinfra-Nandhini  eastus      Microsoft.Network/virtualNetworks        Succeeded
+pip-db-uvn9z                                          rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+nsg-db-uvn9z                                          rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkSecurityGroups  Succeeded
+nic-db-uvn9z                                          rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkInterfaces      Succeeded
+vm-db-uvn9z                                           rg-aiinfra-Nandhini  eastus      Microsoft.Compute/virtualMachines        Succeeded
+vm-db-uvn9z_disk1_8f7d1a6753cf4e5dab45bd49bd24f1f9    RG-AIINFRA-NANDHINI  eastus      Microsoft.Compute/disks                  Succeeded
+sql-7g0iy                                             rg-aiinfra-Nandhini  eastus      Microsoft.Sql/servers                    Succeeded
+sql-7g0iy/master                                      rg-aiinfra-Nandhini  eastus      Microsoft.Sql/servers/databases          Succeeded
+sql-7g0iy/appdb                                       rg-aiinfra-Nandhini  eastus      Microsoft.Sql/servers/databases          Succeeded
+22
+Name              Location
+----------------  ----------
+sql-7g0iy         eastus
+sql-7g0iy/master  eastus
+sql-7g0iy/appdb   eastus
+Name       ResourceGroup        Location    AdministratorLogin
+---------  -------------------  ----------  --------------------
+sql-7g0iy  rg-aiinfra-Nandhini  eastus      sqladminuser
+Name    Tier    Family    Capacity    MaxSize    ElasticPool
+------  ------  --------  ----------  ---------  -------------
+appdb   Basic             5           2GB
+master  System  SYSTEM    4           100GB
+Name           ResourceGroup        PowerState    PublicIps       Fqdns    Location
+-------------  -------------------  ------------  --------------  -------  ----------
+vm-db-uvn9z    rg-aiinfra-Nandhini  VM running    172.190.28.23            eastus
+vm-lab-ubuntu  rg-aiinfra-Nandhini  VM running    52.249.180.130           eastus
+vm-lab-win     rg-aiinfra-Nandhini  VM running    74.235.233.209           eastus
+Name                    ResourceGroup        Location    Zones    Address         IdleTimeoutInMinutes    ProvisioningState
+----------------------  -------------------  ----------  -------  --------------  ----------------------  -------------------
+pip-db-uvn9z            rg-aiinfra-Nandhini  eastus               172.190.28.23   4                       Succeeded
+vm-lab-ubuntuPublicIP   rg-aiinfra-Nandhini  eastus               52.249.180.130  4                       Succeeded
+vm-lab-ubuntuVNET-IPv4  rg-aiinfra-Nandhini  eastus      231      20.237.73.111   4                       Succeeded
+vm-lab-winPublicIP      rg-aiinfra-Nandhini  eastus               74.235.233.209  4                       Succeeded
+Location    Name              ProvisioningState    ResourceGroup        ResourceGuid
+----------  ----------------  -------------------  -------------------  ------------------------------------
+eastus      nsg-db-uvn9z      Succeeded            rg-aiinfra-Nandhini  17eee3e3-c68f-4982-8f04-31aeef13b66b
+eastus      vm-lab-ubuntuNSG  Succeeded            rg-aiinfra-Nandhini  ca03c630-47fd-445e-bbe5-9051c489412b
+eastus      vm-lab-winNSG     Succeeded            rg-aiinfra-Nandhini  4945b164-06ad-49bf-adf5-99a590d74869
+Name               ResourceGroup        Location    NumSubnets    Prefixes      DnsServers    DDOSProtection    VMProtection
+-----------------  -------------------  ----------  ------------  ------------  ------------  ----------------  --------------
+vm-lab-ubuntuVNET  rg-aiinfra-Nandhini  eastus      2             10.0.0.0/16                 False
+vnet-db-uvn9z      rg-aiinfra-Nandhini  eastus      1             10.40.0.0/16                False
+training [ ~/tower-terraform-db-only ]$ 
+training [ ~/tower-terraform-db-only ]$ cd ~/tower-terraform-db-only
+terraform state list
+terraform output
+data.azurerm_resource_group.rg
+azurerm_mssql_database.db
+azurerm_mssql_server.sql
+random_string.sfx
+sql_db_name = "appdb"
+sql_server_name = "sql-7g0iy"
+training [ ~/tower-terraform-db-only ]$ 

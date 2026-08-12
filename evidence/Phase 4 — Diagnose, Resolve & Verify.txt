@@ -1,0 +1,67 @@
+Phase 4 — Diagnose, Resolve & Verify
+
+1) Evidence interpreted (from terminal/output)
+- Resource: sql-7g0iy in rg-aiinfra-Nandhini
+- Fault signal observed: publicNetworkAccess = Disabled
+- Timeline captured in: ~/phase3-evidence-20260812T101415Z/timeline.log
+- Post-remediation check showed: publicNetworkAccess = Enabled
+
+2) Hypothesis
+The access issue was caused by a configuration change on Azure SQL Server:
+- publicNetworkAccess was set to Disabled
+- This blocks public client connectivity
+
+3) Root-cause validation
+Validated with direct evidence:
+- sql_after_fault.json shows "publicNetworkAccess": "Disabled"
+- Final verification command shows sql-7g0iy as Enabled after restore
+- Root cause confirmed as SQL network access configuration change (not compute/storage/database engine failure)
+
+4) Remediation applied
+- Re-enabled SQL public access using:
+  az sql server update ... --set publicNetworkAccess=Enabled
+- Verified server status returned to Enabled
+
+5) Recovery verification vs baseline
+- Baseline in this run showed Disabled (pre-existing fault state from earlier session)
+- After remediation, state became Enabled
+- Recovery objective met
+
+6) Reasoning log (AI-assisted decisions)
+Accepted:
+- Single-variable fault
+- Evidence-before-remediation
+- Explicit post-fix verification
+
+Modified:
+- Documented that baseline was already faulted
+- Treated run as fault-confirm + restore-validation
+
+Rejected:
+- Multi-variable changes (NSG + firewall + SQL together) to avoid ambiguous causation
+
+7) RCA (Root Cause Analysis)
+Incident:
+- Controlled DB access disruption during resilience drill
+
+Root Cause:
+- publicNetworkAccess on sql-7g0iy was Disabled
+
+Impact:
+- Public connectivity to SQL server was unavailable
+
+Detection:
+- az sql server show + structured evidence files in phase3-evidence-*
+
+Resolution:
+- Set publicNetworkAccess=Enabled and rechecked state
+
+Verification:
+- Post-fix output confirms Enabled
+
+Preventive recommendations:
+1. Create Azure Monitor alert for SQL publicNetworkAccess changes
+2. Enforce change control for production-like resource groups
+3. Keep rollback script versioned and readily available
+4. Add pre-check step to confirm initial state before fault injection
+5. Persist evidence to durable storage (Storage account/Git) since Cloud Shell is ephemeral
