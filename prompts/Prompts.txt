@@ -1,1 +1,112 @@
 
+PHASE 1 — BUILD (Fresh Infrastructure as Code, Database Tower)
+
+I am doing Phase 1 for Database Tower in Azure.  
+Please guide me step-by-step with exact commands and files.
+
+Context:
+- I am using Azure Cloud Shell (Bash).
+- My resource group is: rg-aiinfra-Nandhini
+- Region: eastus
+- Existing VM/network resources already exist in the RG from previous labs.
+- I want a cost-conscious setup, so create only database tower resources if possible.
+- If PostgreSQL is not available in this subscription/region, use Azure SQL server + database instead.
+
+What I need you to produce:
+1) Terraform code from scratch (main.tf; variables optional) that:
+   - Uses existing RG (data source, not new RG creation).
+   - Creates only DB resources needed for tower.
+   - Uses safe defaults (small SKU).
+2) Exact terminal commands to run in order:
+   - terraform init
+   - terraform fmt -check
+   - terraform validate
+   - terraform plan -out tfplan
+   - terraform apply tfplan
+3) Day 4 Gate evidence commands and expected outcomes:
+   - Lint gate
+   - Dry-run gate
+   - Idempotency gate (second plan should show no changes)
+   - Bounded scope gate (show only expected resource types)
+4) Verification commands using Azure CLI to prove resources exist.
+5) A short submission note for each gate.
+
+Constraints:
+- Do not paste Terraform directly into shell as commands.
+- Show how to create files using cat <<'EOF' blocks.
+- Keep it robust for Cloud Shell resets (ephemeral files).
+
+
+PHASE 2 — ARM (Fault and Restore, safety gate first)
+
+I am doing Phase 2 for Database Tower.  
+Create a small, safe incident simulation for Azure SQL.
+
+Context:
+- RG: rg-aiinfra-Nandhini
+- SQL server already exists (auto-detect allowed, or explicit sql-7g0iy).
+- I must prove rollback works before fault injection.
+
+Required incident scenario:
+- Fault: set SQL server publicNetworkAccess = Disabled
+- Restore: set publicNetworkAccess = Enabled and ensure firewall rule for current Cloud Shell IP exists
+
+What I need you to produce:
+1) Two Bash scripts:
+   - restore_db_access.sh
+   - fault_db_access.sh
+2) Safety features:
+   - restore script runs first and validates success.
+   - fault script requires explicit confirmation flag (I_UNDERSTAND=YES).
+3) Exact runbook commands:
+   - create scripts
+   - chmod +x
+   - run restore first
+   - then run fault
+   - then restore again
+4) Verification commands after each step showing state.
+5) A concise “graded safety gate passed” evidence note.
+
+Constraints:
+- Single-variable fault only.
+- Keep incident reversible and low risk.
+- Must work in Cloud Shell Bash.
+
+
+PHASE 3 — BREAK & DETECT (evidence-first)
+
+I am doing Phase 3 for Database Tower.  
+I need structured evidence capture before remediation.
+
+Context:
+- RG: rg-aiinfra-Nandhini
+- SQL server: sql-7g0iy (or detect first SQL server in RG)
+
+Requirements:
+- Trigger exactly one controlled fault (publicNetworkAccess disable).
+- Capture evidence in strict sequence:
+  1) baseline
+  2) fault injection
+  3) symptom detection
+  4) activity logs/alerts/metrics snapshot
+- Record UTC timestamps for every step.
+- Save outputs into timestamped evidence folder.
+- Preserve evidence before any remediation.
+
+What I need you to produce:
+1) One Bash script (run_phase3.sh) that:
+   - Creates evidence directory with UTC timestamp.
+   - Writes timeline.log with timestamps.
+   - Captures:
+     - sql_before.json
+     - fault_update.json
+     - sql_after_fault.json
+     - activity_after_fault.json
+2) Commands to print evidence from terminal for grading.
+3) A checklist of what screenshots/output to submit.
+4) A warning/reminder about Cloud Shell ephemerality and how to copy evidence immediately.
+
+Constraints:
+- No multi-variable changes.
+- No remediation until evidence capture is complete.
+- Keep commands deterministic and simple.
