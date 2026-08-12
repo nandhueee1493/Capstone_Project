@@ -1,0 +1,134 @@
+Requesting a Cloud Shell.Succeeded. 
+Connecting terminal...
+
+Your Cloud Shell session will be ephemeral so no files or system changes will persist beyond your current session.
+training [ ~ ]$ RG="rg-aiinfra-Nandhini"
+
+# Subscription check
+az account show --query "{name:name,id:id}" -o table
+
+# RG exists?
+az group show -n "$RG" -o table
+
+# Everything inside RG
+az resource list -g "$RG" -o table
+
+# VM checks
+az vm list -g "$RG" -d -o table
+
+az network public-ip list -g "$RG" -o tableo tabler)
+Name
+-------
+labs108
+Location    Name
+----------  -------------------
+eastus      rg-aiinfra-Nandhini
+Name                                                  ResourceGroup        Location    Type                                     Status
+----------------------------------------------------  -------------------  ----------  ---------------------------------------  ---------
+vm-lab-ubuntuNSG                                      rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkSecurityGroups  Succeeded
+vm-lab-ubuntuPublicIP                                 rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-ubuntuVNET                                     rg-aiinfra-Nandhini  eastus      Microsoft.Network/virtualNetworks        Succeeded
+vm-lab-ubuntuVMNic                                    rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkInterfaces      Succeeded
+vm-lab-ubuntu                                         rg-aiinfra-Nandhini  eastus      Microsoft.Compute/virtualMachines        Succeeded
+vm-lab-ubuntu_disk1_4879362484914f1fa49257b1422d2403  RG-AIINFRA-NANDHINI  eastus      Microsoft.Compute/disks                  Succeeded
+vm-lab-winNSG                                         rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkSecurityGroups  Succeeded
+vm-lab-winPublicIP                                    rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-winVMNic                                       rg-aiinfra-Nandhini  eastus      Microsoft.Network/networkInterfaces      Succeeded
+vm-lab-win                                            rg-aiinfra-Nandhini  eastus      Microsoft.Compute/virtualMachines        Succeeded
+vm-lab-win_disk1_3594618c67a64f8f88c262c17412ce1d     RG-AIINFRA-NANDHINI  eastus      Microsoft.Compute/disks                  Succeeded
+vm-lab-ubuntuVNET-IPv4                                rg-aiinfra-Nandhini  eastus      Microsoft.Network/publicIPAddresses      Succeeded
+vm-lab-ubuntuVNET-bastion                             rg-aiinfra-Nandhini  eastus      Microsoft.Network/bastionHosts           Succeeded
+Name           ResourceGroup        PowerState    PublicIps       Fqdns    Location
+-------------  -------------------  ------------  --------------  -------  ----------
+vm-lab-ubuntu  rg-aiinfra-Nandhini  VM running    52.249.180.130           eastus
+vm-lab-win     rg-aiinfra-Nandhini  VM running    74.235.233.209           eastus
+
+Name                    ResourceGroup        Location    Zones    Address         IdleTimeoutInMinutes    ProvisioningState
+----------------------  -------------------  ----------  -------  --------------  ----------------------  -------------------
+vm-lab-ubuntuPublicIP   rg-aiinfra-Nandhini  eastus               52.249.180.130  4                       Succeeded
+vm-lab-ubuntuVNET-IPv4  rg-aiinfra-Nandhini  eastus      231      20.237.73.111   4                       Succeeded
+vm-lab-winPublicIP      rg-aiinfra-Nandhini  eastus               74.235.233.209  4                       Succeeded
+
+
+
+---------------------------------------------------------------------------------------------------------
+Script: 
+
+Requesting a Cloud Shell.Succeeded. 
+Connecting terminal...
+
+Your Cloud Shell session will be ephemeral so no files or system changes will persist beyond your current session.
+training [ ~ ]$ PARTICIPANT_NAME='Nandhini'  
+UBUNTU_PASS='Training@123'
+WINDOWS_PASS='Training@123'
+LOCATION='eastus'
+RG="rg-aiinfra-${PARTICIPANT_NAME}"
+UBUNTU_VM='vm-lab-ubuntu'
+WINDOWS_VM='vm-lab-win'
+UBUNTU_USER='labadmin'
+WINDOWS_USER='labadmin'
+training [ ~ ]$ az group create \
+  --name "${RG}" \
+  --location "${LOCATION}" \
+  --tags programme='AI-Infra-Engineers' day='3' \
+         participant="${PARTICIPANT_NAME}" \
+  --output table
+Location    Name
+----------  -------------------
+eastus      rg-aiinfra-Nandhini
+training [ ~ ]$ az vm create \
+  --resource-group "${RG}" \
+  --name "${UBUNTU_VM}" \
+  --image Ubuntu2204 \
+  --size Standard_B2s \
+  --admin-username "${UBUNTU_USER}" \
+  --admin-password "${UBUNTU_PASS}" \
+  --authentication-type password \
+  --public-ip-sku Standard \
+  --nsg-rule SSH \
+  --os-disk-size-gb 30 \
+  --no-wait \
+  --output none
+Consider upgrading security for your workloads using Azure Trusted Launch VMs. To know more about Trusted Launch, please visit https://aka.ms/TrustedLaunch.
+training [ ~ ]$ az vm create \
+  --resource-group "${RG}" \
+  --name "${WINDOWS_VM}" \
+  --image Win2022Datacenter \
+  --size Standard_B2s \
+  --admin-username "${WINDOWS_USER}" \
+  --admin-password "${WINDOWS_PASS}" \
+  --authentication-type password \
+  --public-ip-sku Standard \
+  --nsg-rule RDP \
+  --os-disk-size-gb 128 \
+  --no-wait \
+  --output none
+Consider upgrading security for your workloads using Azure Trusted Launch VMs. To know more about Trusted Launch, please visit https://aka.ms/TrustedLaunch.
+training [ ~ ]$ azure -- virtual machines
+bash: azure: command not found
+training [ ~ ]$ -- virtual machines
+bash: --: command not found
+training [ ~ ]$ az vm run-command invoke \
+  --resource-group "${RG}" \
+  --name "${UBUNTU_VM}" \
+  --command-id RunShellScript \
+  --scripts '
+    set -e
+
+    # ── Install tools ────────────────────────────────────────────
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -y \
+      stress-ng \
+      sysstat \
+      net-tools \
+      htop \
+      iotop \
+      fio \
+      python3-pip \
+      python3-psycopg2 \
+      iproute2 \
+      dnsutils \
+  --output tablescripts/storage/ll 2>&1 && echo "  ok  $tool" || echo "  MISSING  $tool"normal
+
+training [ ~ ]$ 
